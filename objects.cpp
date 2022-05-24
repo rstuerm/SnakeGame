@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include "objects.h"
 #include "constants.h"
+#include "time.h"
 
 void Square::Draw(SDL_Renderer *renderer)
 {
@@ -18,18 +19,6 @@ void Square::Draw(SDL_Renderer *renderer)
 		255
 	);
 	SDL_RenderFillRect(renderer, &rect);
-}
-
-// Place a random item at some coordinate on the board.
-void Item::PlaceRandom()
-{
-	seed_x = LehmerRandom(seed_x, RANDOM_MODULO, scaling_x);
-	int new_x = SQUARE_DIM * ( (seed_x - 1) % WIDTH_BLOCKS );
-	Square::Set_x(new_x);
-
-	seed_y = LehmerRandom(seed_y, RANDOM_MODULO, scaling_y);
-	int new_y = SQUARE_DIM * ( (seed_y - 1) % HEIGHT_BLOCKS );
-	Square::Set_y(new_y);
 }
 
 Player::Player()
@@ -165,14 +154,14 @@ Item::Item()
 	int *valid = LehmerTest(RANDOM_MODULO);
 
 	// Get seed from timer to select which scaling and initial input to use.
-	int seed_time = SDL_GetTicks(); 
+	int seed_time = time(NULL); 
 
 	scaling_x = valid[(seed_time % valid[0]) + 1];
 	seed_x = seed_time % RANDOM_MODULO;
 	if (seed_x == 0) seed_x++;
 
-	scaling_y = valid[((seed_time + 7) % valid[0]) + 1];
-	seed_y = (seed_time + 13) % RANDOM_MODULO;
+	scaling_y = valid[(seed_time % valid[0]) + 1];
+	seed_y = seed_time % RANDOM_MODULO;
 	if (seed_y == 0) seed_y++;
 
 	std::cout << scaling_x << " ";
@@ -192,6 +181,19 @@ Item::Item()
 		Item::PlaceRandom();
 	}
 }
+
+// Place a random item at some coordinate on the board.
+void Item::PlaceRandom()
+{
+	seed_x = LehmerRandom(seed_x, RANDOM_MODULO, scaling_x);
+	int new_x = SQUARE_DIM * ( (seed_x - 1) % WIDTH_BLOCKS );
+	Square::Set_x(new_x);
+
+	seed_y = LehmerRandom(seed_y, RANDOM_MODULO, scaling_y);
+	int new_y = SQUARE_DIM * ( (seed_y - 1) % HEIGHT_BLOCKS );
+	Square::Set_y(new_y);
+}
+
 
 // Generates a random number using carefully selected parameters.
 // https://lpuguidecom.files.wordpress.com/2017/05/lehmer-random-number-generators.pdf
