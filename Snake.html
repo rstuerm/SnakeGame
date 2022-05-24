@@ -7,14 +7,23 @@
     <style>
 
       .controls {
-        height: 100px;
-        width: 100px;
-        background-color: white;
-        border: 2px solid;
-        margin-bottom: 4px;
+        height: 10em;
+        width: 10em;
+        margin-bottom: 8px;
+        margin-left: 2px;
+        margin-right: 2px;
       }
-      .controls:active{background-color:rgb(120, 120, 120);}
-      
+      button:active{background-color:rgb(120, 120, 120);}
+
+      button {
+        -webkit-tap-highlight-color: rgba(0,0,0,0); 
+        outline-width: 2px;
+        outline-color: black;
+        outline-style: solid;
+        background-color: white;
+        border: none;
+      } 
+
       body {
         font-family: arial;
         margin: 0;
@@ -25,9 +34,9 @@
       div.emscripten { text-align: center; }      
       div.emscripten_border { border: 0px none black;}
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 2px solid; background-color: black; margin-top: 30px; margin-bottom: 60px;}
+      canvas.emscripten { border: 2px solid; background-color: black; margin-top: 30px; margin-bottom: 60px; width: 60%}
 
-	  .spinner {
+      .spinner {
         height: 30px;
         width: 30px;
         margin: 0;
@@ -206,7 +215,7 @@
         };
       };
 
-	  // https://ryanpcmcquen.org/code/2020/11/26/porting-a-c-game-to-webassembly.html
+      // https://ryanpcmcquen.org/code/2020/11/26/porting-a-c-game-to-webassembly.html
       var create_and_fire_event = function (event, type) {
         var control_event = new Event(type, { bubbles: true });
 
