@@ -1,4 +1,4 @@
-// TO DO:
+// TODO:
 // draw background in green if won, red if lost
 // record number of moves or longest length as high score
 
@@ -7,48 +7,38 @@
 #include "objects.h"
 #include "setup.h"
 #include "constants.h"
+#ifdef __EMSCRIPTEN__
+#include </Users/rileystuermer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten.h>
+#endif
 
 void EventRoutine(SDL_Event *event, Window *window, Player *player);
 void SetScreen(Window *window, Player *player, Item *item, Uint32 *game_time);
+void loop();
+void InitializeObjects();
+
+SDL_Event event;
+Window *window;
+Item *item;
+Uint32 game_time = SDL_GetTicks();
+Player *player;
+int running = 1;
 
 int main()
 {
-	SDL_Event event;
+
+	InitializeObjects();
 	
-	Window *window = new Window[1];
-	
-	if (window->InitScreen() == false) {window->ShutdownScreen();}
-
-	Item *item = new Item[1];
-
-
-	while (window->Status()) 
+	// Loop of single game, exiting this loop starts a new game.
+	#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(loop, 0, running);
+	#else
+	while(running)
 	{
-		Uint32 game_time = SDL_GetTicks();
-		Player *player = new Player[1];
+		loop();
+	} 
+	#endif
 
-		// Loop of singlr game, exiting this loop starts a new game.
-		do {
-			// Look for user input events.
-			if (SDL_PollEvent(&event))
-			{
-				EventRoutine(&event, window, player);
-			}
-
-			// Clear screen for subsequently redrawing player positions and
-			// updating the screen.
-			window->ClearScreen();
-			SetScreen(window, player, item, &game_time);
-			window->UpdateScreen();
-
-		// Leave loop if state is RESTART which then restarts the game, or leave
-		// loop if window status is set to stop, which will than leave the
-		// larger loop as well, ending the game.
-		} while (player->GetState() != RESTART && window->Status());
-
-		delete [] player;
-
-	}
+	delete [] player;
 
 	window->ShutdownScreen();
 
@@ -58,6 +48,46 @@ int main()
 	return EXIT_SUCCESS;
 }
 
+void loop()
+{
+	// Look for user input events.
+	if (SDL_PollEvent(&event))
+	{
+		EventRoutine(&event, window, player);
+	}
+	// Clear screen for subsequently redrawing player positions and
+	// updating the screen.
+	window->ClearScreen();
+	SetScreen(window, player, item, &game_time);
+	window->UpdateScreen();
+
+	// Leave loop if state is RESTART which then restarts the game, or leave
+	// loop if window status is set to stop, which will than leave the
+	// larger loop as well, ending the game.
+	if (player->GetState() == RESTART) 
+		{
+			delete [] player;
+			#ifdef __EMSCRIPTEN__
+			#else
+			window->ShutdownScreen();
+			#endif
+			InitializeObjects();
+		}
+	if (!(window->Status())) 
+	{
+		running = 0;
+	}
+}
+
+void InitializeObjects()
+{
+	window = new Window[1];
+	item = new Item[1];
+	game_time = SDL_GetTicks();
+	player = new Player[1];
+
+	if (window->InitScreen() == false) {window->ShutdownScreen();}
+}
 
 void SetScreen(Window *window, Player *player, Item *item, Uint32 *game_time)
 {
@@ -118,7 +148,7 @@ void EventRoutine(SDL_Event *event, Window *window, Player *player)
 			{
 				player->SetState(RESTART);
 			}
-
+			
 			if (event->key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 			{
 				window->Stop();
@@ -163,5 +193,3 @@ void EventRoutine(SDL_Event *event, Window *window, Player *player)
 		window->Stop();
 	}
 }
-
-

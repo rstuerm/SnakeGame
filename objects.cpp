@@ -15,7 +15,7 @@ void Square::Draw(SDL_Renderer *renderer)
 		Colors::WHITE.r,
 		Colors::WHITE.g,
 		Colors::WHITE.b,
-		Colors::WHITE.a
+		255
 	);
 	SDL_RenderFillRect(renderer, &rect);
 }

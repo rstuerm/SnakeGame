@@ -56,7 +56,7 @@ void Window::ClearScreen()
 		Colors::BLACK.r, 
 		Colors::BLACK.g, 
 		Colors::BLACK.b, 
-		Colors::BLACK.a
+		255
 	);
 	SDL_RenderClear(renderer);
 }
